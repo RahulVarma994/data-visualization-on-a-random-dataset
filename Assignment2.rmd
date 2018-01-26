@@ -1,0 +1,251 @@
+---
+title: "STATS Assignment 2"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+Question:
+
+An Excel file 'Prospective Students Data.csv' is enclosed. The excel file consists of the data of individuals collected through lead generation and whether the individual leads have been converted to prospective student and whether the student have completed the course successfully. As a data scientist, you are requested to provide useful insights from the data. You can use charts and histograms to justify your report. Please give your R-code (if applicable) in a separate file.
+
+# Imporitng the Data Set
+
+```{r}
+psd = read.csv(file = "D:/Prospective Students Data MBA Course_Final.csv")
+```
+
+```{r}
+summary(psd)
+```
+
+Insight of the Couse Completion based in the Maried Status 
+
+```{r}
+counts <- table(psd$MAR_STATUS,psd$COURSE_COMP)
+  barplot(counts, main="Course completion based on Married status",
+  xlab = "Course Completion", col= c("yellow","green"),
+  legend = rownames(counts) , beside= TRUE)
+```
+
+
+```{r}
+student = psd
+StudentADMTAKData<-subset(student$ADM_TAKEN,student$ADM_TAKEN=="YES")
+StudentADMTAKDatas=length(StudentADMTAKData)
+TOTALAPPL=nrow(student)
+PERSTDTAKADM=(StudentADMTAKDatas/TOTALAPPL)*100
+PERSTDTOTALAPPL=(TOTALAPPL/TOTALAPPL)*100
+StudentCOURSECOMP<-subset(student$COURSE_COMP,student$COURSE_COMP=="YES")
+StudentCOURSECOMPs=length(StudentCOURSECOMP)
+TOTALAPPL=nrow(student)
+PERSTDCOURSECOMP=(StudentCOURSECOMPs/TOTALAPPL)*100
+slices <- c(PERSTDTOTALAPPL,PERSTDTAKADM,PERSTDCOURSECOMP) 
+lbls <- c("No of Students Applied","No of students Admitions Taken","No of students Course Completed")
+barplot(slices,names.arg = lbls,ylab="No of Students in %",col= c("green","violet","orange"),border = "black",main = "PROSPECTIVE STUDENTS DATA HISTORY")
+```
+
+
+```{r}
+psdsm=sum(psd$STREAM == "Management" & psd$COURSE_COMP == "YES")
+psdsm
+
+psdsc=sum(psd$STREAM == "Commerce" & psd$COURSE_COMP == "YES")
+psdsc
+
+psdsa=sum(psd$STREAM == "Arts" & psd$COURSE_COMP == "YES")
+psdsa
+
+psdss=sum(psd$STREAM == "Science" & psd$COURSE_COMP == "YES")
+psdss
+
+psdse=sum(psd$STREAM == "Engineering" & psd$COURSE_COMP == "YES")
+psdse
+
+sumc=sum(psd$COURSE_COMP == "YES")
+sumc
+
+slices <- c(psdsm, psdsa, psdsc, psdse, psdss) 
+lbls <- c("Management", "Arts", "Commerece", "Engineering", "Science")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+  	main="Pie Chart of Stream of students Completed the Course")
+```
+
+```{r}
+psdsm=sum(psd$MAR_STATUS == "MARRIED" & psd$CHILDREN == "YES" & psd$COURSE_COMP == "YES")
+psdsm
+psdsms=sum(psd$MAR_STATUS == "MARRIED" & psd$CHILDREN == "NO" & psd$COURSE_COMP == "YES")
+psdsms
+slices <- c(psdsm, psdsms) 
+lbls <- c("children","No Chidren")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=c("blue","green"),
+  main="Pie Chart of  Married students Completed the Course  with and without children")
+```
+
+```{r}
+colss=c("pink","green","skyblue","red")
+hist(psd$X12TH, breaks=10, col=colss, main="Histogram of the 12th Class Students score ")
+```
+
+```{r}
+psdsm=sum(psd$MAR_STATUS == "MARRIED" & psd$COURSE_COMP == "YES")
+psdsm
+psdsms=sum(psd$MAR_STATUS == "SINGLE" &  psd$COURSE_COMP == "YES")
+psdsms
+slices <- c(psdsm, psdsms) 
+lbls <- c("Married","Single")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+  	main="Pie Chart of  Marital Status of  students Completed the Course ")
+```
+
+```{r}
+require(dplyr)
+coursecomp=student%>%select(COURSE_COMP)%>% filter(COURSE_COMP=="YES")
+Totalcoursecomp=nrow(coursecomp)
+#student$JOB_LEVEL<-with(student,impute(JOB_LEVEL,'random'))
+stujoblevelAM=student%>%select(JOB_LEVEL,COURSE_COMP)%>% filter(JOB_LEVEL=="AM",COURSE_COMP=="YES")
+TotaljoblevelAM=nrow(stujoblevelAM)
+perjoblevelAM=(TotaljoblevelAM/Totalcoursecomp)*100
+stujoblevelExec=student%>%select(JOB_LEVEL,COURSE_COMP)%>% filter(JOB_LEVEL=="Executive",COURSE_COMP=="YES")
+TotaljoblevelExec=nrow(stujoblevelExec)
+perjoblevelExec=(TotaljoblevelExec/Totalcoursecomp)*100
+stujoblevelMang=student%>%select(JOB_LEVEL,COURSE_COMP)%>% filter(JOB_LEVEL=="Manager",COURSE_COMP=="YES")
+TotaljoblevelMang=nrow(stujoblevelMang)
+perjoblevelMang=(TotaljoblevelMang/Totalcoursecomp)*100
+stujoblevelFres=student%>%select(JOB_LEVEL,COURSE_COMP)%>% filter(JOB_LEVEL=="Fresher",COURSE_COMP=="YES")
+TotaljoblevelFres=nrow(stujoblevelFres)
+perjoblevelFresh=(TotaljoblevelFres/Totalcoursecomp)*100
+stujoblevelNA=student%>%select(JOB_LEVEL,COURSE_COMP)%>% filter(is.na(JOB_LEVEL),COURSE_COMP=="YES")
+TotaljoblevelNA=nrow(stujoblevelNA)
+perjoblevelNA=(TotaljoblevelNA/Totalcoursecomp)*100
+
+slices <- c(perjoblevelAM,perjoblevelExec,perjoblevelMang,perjoblevelFresh,perjoblevelNA) 
+lbls <- c("AM", "Executive", "Manager", "Fresher","NA")
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels 
+lbls <- paste(lbls,"%",sep="") # ad % to labels 
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+    main="Pie Chart of Job Levels how much % completed the course")
+
+library(plotrix)
+pie3D(slices,labels=lbls,explode=0.1,main="Pie Chart of Job Levels how much % completed the course")
+
+```
+
+```{r}
+studentincome=student%>%filter(student$COURSE_COMP=='YES' & !is.na(student$ANN_INCOME))
+hist(studentincome$ANN_INCOME,breaks=12, col=c("Blue","green","pink"),border="red", xlab="Annual Income of Employees",main = "Frequency Distribution of Annual Income")
+```
+
+
+```{r }
+gwdata= psd
+gwdata
+gwdata1<-subset(gwdata$GENDER,gwdata$GENDER=="FEMALE")
+len=length(gwdata1)
+TOTALppl=nrow(gwdata)
+PERfemale=(len/TOTALppl)*100
+PERfemale
+
+PERTOTPEOPLE=(TOTALppl/TOTALppl)*100
+PERTOTPEOPLE
+
+gwdata2<-subset(gwdata$WORK,gwdata$WORK=="Y")
+len1=length(gwdata2)
+TOTALppl=nrow(gwdata)
+PERwork=(len1/TOTALppl)*100
+PERwork
+
+slices<- c(PERTOTPEOPLE,PERwork,PERfemale)
+lbls<-c("Total people","Total working","Working Female")
+barplot(slices,names.arg = lbls,ylab="No of ppl in %",col=c("blue","yellow","cyan"),border = "black",main = "PROSPECTIVE NO. OF WORKING DATA HISTORY")
+```
+
+```{r}
+counts <- table(psd$HIGH_EDN,psd$ADM_TAKEN)
+barplot(counts, main="Education Distribution based on Admission ",
+  xlab="Admission taken", col=c("darkblue","red"),
+ 	legend = rownames(counts), beside=TRUE)
+```
+
+```{r }
+
+gwdata= psd
+gwdata
+
+gwdata1<-subset(gwdata$GENDER,gwdata$GENDER=="FEMALE")
+len=length(gwdata1)
+TOTALppl=nrow(gwdata)
+PERfemale=(len/TOTALppl)*100
+PERfemale
+
+gwdata2<-subset(gwdata$GENDER,gwdata$GENDER=="MALE")
+len=length(gwdata2)
+TOTALppl=nrow(gwdata)
+PERmale=(len/TOTALppl)*100
+PERmale
+
+PERTOTPEOPLE=(TOTALppl/TOTALppl)*100
+PERTOTPEOPLE
+
+
+slices<- c(PERTOTPEOPLE,PERfemale,PERmale)
+lbls<-c("Total people","Working Female","Working Male")
+barplot(slices,names.arg = lbls,ylab="No of ppl in %",col=c("yellow","cyan","maroon"),border = "black",main = "PROSPECTIVE NO. OF WORKING DATA HISTORY")
+```
+
+```{r}
+student = read.csv(file = "D:/Prospective Students Data MBA Course_Final.csv")
+studentL = nrow(student)
+studentcom <- subset(student,student$COURSE_COMP == "YES")
+studentcoml <- nrow(studentcom)
+studentmarried <- subset(student,student$MAR_STATUS=="MARRIED")
+studentmarriedL <- nrow(studentmarried)
+studentmarriedcoucom <- subset(studentmarried,studentmarried$COURSE_COMP == "YES")
+studentmarriedcoucoml <- nrow(studentmarriedcoucom)
+studentmarriedadmy <- subset(studentmarried,studentmarried$ADM_TAKEN == "YES")
+studentmarriedadmyL <-nrow(studentmarriedadmy)
+studentmarriedcyes <- subset(student,student$MAR_STATUS=="MARRIED" & student$CHILDREN =="YES")
+studentmarriedcyesL <- nrow(studentmarriedcyes)
+studentmarriedcno  <- subset(student,student$MAR_STATUS=="MARRIED" & student$CHILDREN =="NO")
+studentmarriedcnoL <- nrow(studentmarriedcno)
+studentnomarry     <- subset(student,student$MAR_STATUS=="SINGLE")
+studentnomarryL    <- nrow(studentnomarry)
+studentmarriedcyesadmy <- subset(studentmarriedcyes, studentmarriedcyes$ADM_TAKEN == "YES")
+studentmarriedcyesadmyL <- nrow(studentmarriedcyesadmy)
+studentmarriedcnoadmn <- subset(studentmarriedcno, studentmarriedcyes$ADM_TAKEN == "YES")
+studentmarriedcnoadmnL <- nrow(studentmarriedcnoadmn)
+studentnomarryadmy <- subset(studentnomarry, studentnomarry$ADM_TAKEN == "YES")
+studentnomarryadmyL <- nrow(studentnomarryadmy)
+
+slices = c(studentL,studentcoml,studentmarriedL, studentmarriedcoucoml,studentmarriedadmyL,studentmarriedcyesL,studentmarriedcyesadmyL,studentmarriedcnoL,studentmarriedcnoadmnL,studentnomarryL,studentnomarryadmyL)
+lbls <- c("total \n applicants", "totalapplicants \n whocompleted \n course", "married Students  \n Applied", "married Students  \n Applied and \n completed course","studentmarried \n adm taken","married Students \n Applied with child","married Students Applied with \n child add taken","married Students \n Applied with no child"
+          ,"studentmarried child noadd taken","student who is single","student who is singleadmtaken")
+
+xx = barplot(slices, ylab="No of Students in nums",col= c("blue"),border = "black",main = "PROSPECTIVE STUDENTS DATA HISTORY ")
+text(x = xx, y = slices,label = slices, pos = 3, cex = 0.8, col = "red")
+axis(1, at=xx, label=lbls, tick=FALSE, las=3, line=-0.5, cex.axis=0.9)
+
+```
+
+
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
